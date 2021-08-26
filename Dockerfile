@@ -1,6 +1,6 @@
 FROM python:3.8-alpine
 
-RUN pip install flask pymongo flask-cors requests urllib3 python-dateutil
+RUN pip install flask pymongo flask-cors requests urllib3 python-dateutil mongo
 
 COPY pos.py /opt/pos.py
 
