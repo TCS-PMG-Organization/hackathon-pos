@@ -131,7 +131,7 @@ def submit_payment():
 
         if _name and _amount and _card_no and _card_type and _expiry_date and _security_code and _zip_code and request.method == 'POST':
             #if  _amount > amt_rule_value or _zip_code != zip_code_rule_value or timestamp_value > sart_time_value or timestamp_value < end_time_value:
-            if  _amount > amt_rule_value or _zip_code != zip_code_rule_value or timestamp_value > sart_time_value:
+            if  _amount > amt_rule_value or _zip_code != zip_code_rule_value:
                 Edge_Fraud_Transactions.insert_one(submitdata)
                 msg = {"status": "error",
                        "status_msg": "This ia fraudulant transaction!!!",
