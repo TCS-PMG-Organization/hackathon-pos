@@ -56,7 +56,9 @@ except Exception as ex:
 ################################### Api calls ###################################
 
 
-
+@app.route("/")
+def hello_world():
+    return ("hello world \nMONGODB_URL = " + MONGODB_URL)
 
 @app.route("/login", methods=['POST'])
 def login():
