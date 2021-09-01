@@ -27,7 +27,7 @@ MONGODB_USER = "admin"
 MONGODB_PASSWORD = "admin"
 MONGODB_DATABASE = "Edge_BankDB"
 #MONGODB_DOMAIN = "45a49dbf-us-east.lb.appdomain.cloud"
-MONGODB_DOMAIN = "1e1b849f-eu-de.lb.appdomain.cloud"
+MONGODB_DOMAIN = "edgedb.edge-open-banking-tcs.svc"
 MONGODB_PORT = "27017"
 
 try:
