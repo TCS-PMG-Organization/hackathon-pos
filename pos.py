@@ -20,6 +20,7 @@ class MyEncoder(json.JSONEncoder):
 
 
 app = Flask(__name__)
+CORS(app)
 app.json_encoder = MyEncoder
 
 ################################### Database Configuration ############################
