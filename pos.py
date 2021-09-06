@@ -105,6 +105,9 @@ def submit_payment():
         _zip_code = submitdata['zip_code']
         _timestamp = submitdata['timestamp']
         _order_id = submitdata['order_id']
+        
+        ts = datetime.now()
+        timestamp_value = datetime.timestamp(ts)
 
         _time_rule = get_time_limit_rule()
         _amount_rule = get_amount_limit_rule()
@@ -123,8 +126,8 @@ def submit_payment():
             end_time = str(datetime.now().date()) + ' ' + '06:00:00'
         end_time_value = datetime.strptime(end_time, '%Y-%m-%d %H:%M:%S')
 
-        ts = int(_timestamp)
-        timestamp_value = datetime.fromtimestamp(ts)
+        #ts = int(_timestamp)
+        #timestamp_value = datetime.fromtimestamp(ts)
 
         amt_rule_value = _amount_rule['limit']
         zip_code_rule_value = _zipcode_rule['zipcode_value']
