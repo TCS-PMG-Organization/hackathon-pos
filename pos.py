@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 import mongo as mongo
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
@@ -20,7 +20,6 @@ class MyEncoder(json.JSONEncoder):
 
 
 app = Flask(__name__)
-CORS(app)
 app.json_encoder = MyEncoder
 
 ################################### Database Configuration ############################
@@ -57,9 +56,7 @@ except Exception as ex:
 ################################### Api calls ###################################
 
 
-@app.route("/")
-def hello_world():
-    return ("hello world \nMONGODB_URL = " + MONGODB_URL)
+
 
 @app.route("/login", methods=['POST'])
 def login():
@@ -103,14 +100,16 @@ def submit_payment():
         _expiry_date = submitdata['expiry_date']
         _security_code = submitdata['security_code']
         _zip_code = submitdata['zip_code']
-        _timestamp = submitdata['timestamp']
+        #_timestamp = submitdata['timestamp']
         _order_id = submitdata['order_id']
-        
+
         ts = datetime.now()
         timestamp_value = datetime.timestamp(ts)
+        dt_timestamp_value = datetime.fromtimestamp(timestamp_value)
 
-        _time_rule = get_time_limit_rule()
         _amount_rule = get_amount_limit_rule()
+        _time_rule = get_time_limit_rule()
+
         _zipcode_rule = get_zipcode_rule()
         _translimit_rule = get_transaction_limit_rule()
 
@@ -126,26 +125,31 @@ def submit_payment():
             end_time = str(datetime.now().date()) + ' ' + '06:00:00'
         end_time_value = datetime.strptime(end_time, '%Y-%m-%d %H:%M:%S')
 
-        #ts = int(_timestamp)
-        #timestamp_value = datetime.fromtimestamp(ts)
+
 
         amt_rule_value = _amount_rule['limit']
         zip_code_rule_value = _zipcode_rule['zipcode_value']
 
 
         if _name and _amount and _card_no and _card_type and _expiry_date and _security_code and _zip_code and request.method == 'POST':
-            #if  _amount > amt_rule_value or _zip_code != zip_code_rule_value or timestamp_value > sart_time_value or timestamp_value < end_time_value:
-            if  _amount < amt_rule_value and _zip_code == zip_code_rule_value and timestamp_value < sart_time_value:
+            if  _amount < amt_rule_value and _zip_code == zip_code_rule_value and dt_timestamp_value < sart_time_value:
                 _insertedID = Edge_Transactions.insert_one(submitdata).inserted_id
-                msg = {"status": "success", "status_msg": "Your Transaction was successful !!!", "transactionID": str(_insertedID)}
-                
+                msg = {"status": "success", "status_msg": "Your Transaction was successful !!!",
+                       "transactionID": str(_insertedID)}
+                #Edge_Fraud_Transactions.insert_one(submitdata)
+                #msg = {"status": "error",
+                       #"status_msg": "This ia fraudulant transaction!!!",
+                       #"transactionID": "null"}
+                #insert into fraud trans table & raise error
             else:
                 Edge_Fraud_Transactions.insert_one(submitdata)
                 msg = {"status": "error",
                        "status_msg": "This ia fraudulant transaction!!!",
                        "transactionID": "null"}
-             #insert into fraud trans table & raise error
-               
+                # insert into fraud trans table & raise error
+              #_insertedID = Edge_Transactions.insert_one(submitdata).inserted_id
+              #msg = {"status": "success", "status_msg": "Your Transaction was successful !!!", "transactionID": str(_insertedID)}
+
     except ex:
         msg = {"status": "error" + str(ex),
                     "status_msg": "Your Transaction was not successful !!!",
@@ -155,39 +159,50 @@ def submit_payment():
 def get_time_limit_rule():
     msgrules= ""
     rule=""
-    msgrules = Edge_Transaction_Rules.find()
-    for row in msgrules:
-        if row["rule_type"] == "time":
-            rule = row
-    return rule
+    try:
+        msgrules = Edge_Transaction_Rules.find()
+        for row in msgrules:
+            if row["rule_type"] == 'time':
+                rule = row
+        return rule
+    except ex:
+        return jsonify(ex)
 
 def get_amount_limit_rule():
     msgrules= ""
     rule=""
-    msgrules = Edge_Transaction_Rules.find()
-    for row in msgrules:
-        if row["rule_type"] == "amount":
-            rule = row
-    return rule
+    try:
+        msgrules = Edge_Transaction_Rules.find()
+        for row in msgrules:
+            if row["rule_type"] == 'amount':
+                rule = row
+        return rule
+    except ex:
+        return jsonify(ex)
 
 def get_zipcode_rule():
     msgrules= ""
     rule=""
-    msgrules = Edge_Transaction_Rules.find()
-    for row in msgrules:
-        if row["rule_type"] == "zipcode":
-            rule = row
-    return rule
+    try:
+        msgrules = Edge_Transaction_Rules.find()
+        for row in msgrules:
+            if row["rule_type"] == 'zipcode':
+                rule = row
+        return rule
+    except ex:
+        return jsonify(ex)
 
 def get_transaction_limit_rule():
     msgrules= ""
     rule=""
-    msgrules = Edge_Transaction_Rules.find()
-    for row in msgrules:
-        if row["rule_type"] == "transaction_limit":
-            rule = row
-
-    return rule
+    try:
+        msgrules = Edge_Transaction_Rules.find()
+        for row in msgrules:
+            if row["rule_type"] == 'transaction_limit':
+                rule = row
+        return rule
+    except ex:
+        return jsonify(ex)
 ###################################
 
 
